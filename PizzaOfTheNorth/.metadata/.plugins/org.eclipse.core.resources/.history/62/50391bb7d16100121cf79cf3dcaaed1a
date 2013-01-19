@@ -1,0 +1,217 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+
+public class PizzaFrame extends JFrame {
+	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8297270374866123818L;
+
+	PizzaFrame() {
+		super();
+		this.setTitle("Pizza of the North");
+		this.setSize(640, 480);
+		try {
+			this.setIconImage(ImageIO.read(getClass().getResource("pizzaicon.jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		setupToolbars();
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(true);
+	}
+	
+	void setupToolbars() {
+		this.setJMenuBar(new FileMenu(this));
+		addEmployee();
+	}
+	
+	boolean addEmployee() {
+		JDialog d = new JDialog();
+		d.setTitle("Hire Employee");
+		d.setModal(true);
+		d.setLocationRelativeTo(this);
+		d.setSize(300,200);
+		try {
+			d.setIconImage(ImageIO.read(this.getClass().getResource("pizzaicon.jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Box overall = Box.createVerticalBox();
+		
+		Box name = Box.createHorizontalBox();
+		JLabel nameLabel = new JLabel("Name: ");
+		JTextField nameText = new JTextField();
+		name.add(nameLabel);
+		name.add(Box.createHorizontalStrut(15));
+		name.add(Box.createGlue());
+		name.add(nameText);
+		overall.add(name);
+		
+		Box ssn = Box.createHorizontalBox();
+		JLabel ssnLabel = new JLabel("SSN: ");
+		JTextField ssnText = new JTextField();
+		ssn.add(ssnLabel);
+		ssn.add(Box.createHorizontalStrut(24));
+		ssn.add(Box.createGlue());
+		ssn.add(ssnText);
+		overall.add(Box.createGlue());
+		overall.add(ssn);
+		
+		Box address = Box.createHorizontalBox();
+		JLabel addressLabel = new JLabel("Address: ");
+		JTextField addressText = new JTextField();
+		address.add(addressLabel);
+		address.add(Box.createGlue());
+		address.add(addressText);
+		overall.add(Box.createGlue());
+		overall.add(address);
+		
+		Box date = Box.createHorizontalBox();
+		JLabel dateLabel = new JLabel("Date: ");
+		JTextField dateText = new JTextField("MM");
+		JTextField dateText2 = new JTextField("DD");
+		JTextField dateText3 = new JTextField("YYYY");
+		date.add(dateLabel);
+		date.add(Box.createHorizontalStrut(22));
+		date.add(Box.createGlue());
+		date.add(dateText);
+		date.add(Box.createGlue());
+		date.add(dateText2);
+		date.add(Box.createGlue());
+		date.add(dateText3);
+		overall.add(Box.createGlue());
+		overall.add(date);
+		
+		//set up the submit and cancel buttons
+		JPanel buttons = new JPanel();
+		JButton ok = new JButton("Submit");
+		JButton canc = new JButton("Cancel");
+		buttons.add(ok);
+		buttons.add(canc);
+		
+		ok.addActionListener(new OKListener(nameText,ssnText,addressText,dateText,dateText2,dateText3,d));
+		canc.addActionListener(new CancelListener(d));
+		
+		d.add(overall);
+		d.add(buttons,BorderLayout.SOUTH);
+		d.setVisible(true);
+		return false;
+	}
+	
+	class FileMenu extends JMenuBar {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3286626637241680256L;
+		PizzaFrame frame;
+		
+		FileMenu(PizzaFrame frame) {
+			this.frame = frame;
+			JMenu file = new JMenu("File");
+			JMenuItem item1 = new JMenuItem("Initialize this space!");
+			file.add(item1);
+			this.add(file);
+		}
+	}
+	
+	
+	class OKListener implements ActionListener {
+		JTextField name;
+		JTextField ssn;
+		JTextField address;
+		JTextField dateMonth;
+		JTextField dateDay;
+		JTextField dateYear;
+		JDialog d;
+		
+		OKListener(JTextField name, JTextField ssn, JTextField address, JTextField dateMonth, JTextField dateDay, JTextField dateYear, JDialog d) {
+			this.name = name;
+			this.ssn = ssn;
+			this.address = address;
+			this.dateDay = dateDay;
+			this.dateMonth = dateMonth;
+			this.dateYear = dateDay;
+			this.d = d;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String name = this.name.getText();
+			if (name == null || name.equals("")) {
+				setWhite();
+				this.name.setBackground(Color.yellow);
+				JOptionPane.showMessageDialog(null,"Need a non empty name","",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			String nameHash = PizzaBase.userHash(name);
+			if (PizzaBase.passMap.containsKey(nameHash)) {
+				setWhite();
+				this.name.setBackground(Color.yellow);
+				JOptionPane.showMessageDialog(null,"Name already in use","",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			else {
+				this.name.setBackground(Color.white);
+			}
+			int ssn = 0;
+			try {
+				ssn = Integer.parseInt(this.ssn.getText());
+			}
+			catch (Exception e) {
+				setWhite();
+				JOptionPane.showMessageDialog(null, "Invalid ssn, try removing dashes.","",JOptionPane.ERROR_MESSAGE);
+				this.ssn.setBackground(Color.yellow);
+				return;
+			}
+			if (ssn ==0) {
+				setWhite();
+				JOptionPane.showMessageDialog(null, "SSN cannot be zero.","",JOptionPane.ERROR_MESSAGE);
+				this.ssn.setBackground(Color.yellow);
+				return;
+			}
+		}
+		
+		private void setWhite() {
+			this.name.setBackground(Color.white);
+			this.ssn.setBackground(Color.white);
+			this.address.setBackground(Color.white);
+			this.dateDay.setBackground(Color.white);
+			this.dateMonth.setBackground(Color.white);
+			this.dateYear.setBackground(Color.white);
+		}
+	}
+	
+	class CancelListener implements ActionListener {
+		JDialog d;
+		
+		CancelListener(JDialog d) {
+			this.d = d;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			d.dispose();
+		}
+	}
+}

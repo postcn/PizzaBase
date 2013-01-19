@@ -1,0 +1,119 @@
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JTextField;
+
+
+public class PizzaFrame extends JFrame {
+	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8297270374866123818L;
+
+	PizzaFrame() {
+		super();
+		this.setTitle("Pizza of the North");
+		this.setSize(640, 480);
+		try {
+			this.setIconImage(ImageIO.read(getClass().getResource("pizzaicon.jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		setupToolbars();
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(true);
+	}
+	
+	void setupToolbars() {
+		this.setJMenuBar(new FileMenu(this));
+		addEmployee();
+	}
+	
+	boolean addEmployee() {
+		JDialog d = new JDialog();
+		d.setTitle("Hire Employee");
+		d.setModal(true);
+		d.setLocationRelativeTo(this);
+		d.setSize(300,200);
+		try {
+			d.setIconImage(ImageIO.read(this.getClass().getResource("pizzaicon.jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Box overall = Box.createVerticalBox();
+		
+		Box name = Box.createHorizontalBox();
+		JLabel nameLabel = new JLabel("Name: ");
+		JTextField nameText = new JTextField();
+		name.add(nameLabel);
+		name.add(Box.createGlue());
+		name.add(nameText);
+		overall.add(name);
+		
+		Box ssn = Box.createHorizontalBox();
+		JLabel ssnLabel = new JLabel("SSN: ");
+		JTextField ssnText = new JTextField();
+		ssn.add(ssnLabel);
+		ssn.add(Box.createHorizontalStrut(25));
+		ssn.add(Box.createGlue());
+		ssn.add(ssnText);
+		overall.add(Box.createGlue());
+		overall.add(ssn);
+		
+		Box address = Box.createHorizontalBox();
+		JLabel addressLabel = new JLabel("Address: ");
+		JTextField addressText = new JTextField();
+		address.add(addressLabel);
+		address.add(Box.createGlue());
+		address.add(addressText);
+		overall.add(Box.createGlue());
+		overall.add(address);
+		
+		Box date = Box.createHorizontalBox();
+		JLabel dateLabel = new JLabel("Date: ");
+		JTextField dateText = new JTextField("MM");
+		JTextField dateText2 = new JTextField("DD");
+		JTextField dateText3 = new JTextField("YYYY");
+		date.add(dateLabel);
+		date.add(Box.createHorizontalStrut(22));
+		date.add(Box.createGlue());
+		date.add(dateText);
+		date.add(Box.createGlue());
+		date.add(dateText2);
+		date.add(Box.createGlue());
+		date.add(dateText3);
+		overall.add(Box.createGlue());
+		overall.add(date);
+		
+		d.add(overall);
+		d.setVisible(true);
+		return false;
+	}
+	
+	class FileMenu extends JMenuBar {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3286626637241680256L;
+		PizzaFrame frame;
+		
+		FileMenu(PizzaFrame frame) {
+			this.frame = frame;
+			JMenu file = new JMenu("File");
+			JMenuItem item1 = new JMenuItem("Initialize this space!");
+			file.add(item1);
+			this.add(file);
+		}
+	}
+	
+}

@@ -1,0 +1,132 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+
+public class PizzaBase {
+	static String dir;
+	static String username;
+	static HashMap<String,String> passMap;
+
+	/**
+	 * Main method for running the pizza database system
+	 * @param args
+	 */
+	@SuppressWarnings("unchecked")
+	public static void main(String[] args) {
+		dir = System.getProperty("user.dir");
+		try {
+			ObjectInputStream ostream = new ObjectInputStream(new FileInputStream(dir+"/pass.p"));
+			passMap = (HashMap<String,String>) ostream.readObject();
+		} catch (FileNotFoundException e) {
+			if (JOptionPane.showConfirmDialog(null,"No login file found. Would you like to create a default?", "",JOptionPane.WARNING_MESSAGE) != 0) {
+				return;
+			}
+			passMap = new HashMap<String,String>();
+			passMap.put("Administrator", "password");
+			savePass();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		if (login()) {
+			new PizzaFrame();
+		}	
+	}
+	
+	static boolean login() {
+		JFrame frame = new JFrame();
+		frame.setTitle("Login to PizzaBase");
+		Boolean checker = new Boolean(false);
+		Box center = Box.createVerticalBox();
+		Box username = Box.createHorizontalBox();
+		Box password = Box.createHorizontalBox();
+		JLabel use = new JLabel("Username: ");
+		JLabel pass = new JLabel("Password: ");
+		JTextField user = new JTextField();
+		JTextField passw = new JTextField();
+		username.add(use);
+		username.add(Box.createGlue());
+		password.add(pass);
+		password.add(Box.createGlue());
+		center.add(username);
+		center.add(Box.createGlue());
+		center.add(password);
+		frame.add(center);
+		frame.setSize(300,100);
+		frame.setVisible(true);
+		JButton login = new JButton("Login");
+		login.addActionListener(new LoginListener(5,user,passw,checker));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		return false;
+	}
+	
+	private class LoginListener implements ActionListener {
+		private int attempts;
+		private JTextField username;
+		private JTextField password;
+		private Boolean checker;
+		
+		LoginListener(int attempts, JTextField username, JTextField password,Boolean checker) {
+			this.attempts = attempts;
+			this.username = username;
+			this.password = password;
+			this.checker = checker;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (attempts > 0) {
+				String useHash = userHash(username.getText());
+				String passHash = userHash(password.getText());
+				if (passMap.get(useHash).equals(passHash)) {
+					checker = true;
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Login Failure");
+					password.setText("");
+				}
+			}
+		}
+	}
+
+	private static void savePass() {
+		try {
+			ObjectOutputStream ostream = new ObjectOutputStream(new FileOutputStream(dir+"/pass.p"));
+			ostream.writeObject(passMap);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static String userHash(String toHash) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] array = toHash.getBytes();
+			md.update(array, 0, array.length);
+			BigInteger i = new BigInteger(1,md.digest());
+			return i.toString();
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
+	}
+}

@@ -1,0 +1,22 @@
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+
+public class PizzaFrame extends JFrame {
+
+	PizzaFrame() {
+		super();
+		this.setTitle("Pizza of the North");
+		this.setSize(640, 480);
+		try {
+			this.setIconImage(ImageIO.read(getClass().getResource("pizzaicon.jpg")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(true);
+	}
+}

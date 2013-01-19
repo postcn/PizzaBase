@@ -1,0 +1,29 @@
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+
+public class PizzaBase {
+
+	/**
+	 * Main method for running the pizza database system
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new PizzaFrame();
+		System.out.println("Administrator: "+userHash("Administrator"));
+	}
+
+	
+	private static String userHash(String toHash) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] array = toHash.getBytes();
+			md.update(array, 0, array.length);
+			BigInteger i = new BigInteger(1,md.digest());
+			return i.toString();
+		} catch (NoSuchAlgorithmException e) {
+			return null;
+		}
+	}
+}

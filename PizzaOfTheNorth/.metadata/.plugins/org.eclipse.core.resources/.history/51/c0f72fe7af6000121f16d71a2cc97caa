@@ -1,0 +1,12 @@
+
+public class PizzaBase {
+
+	/**
+	 * Main method for running the pizza database system
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new PizzaFrame();
+	}
+
+}
